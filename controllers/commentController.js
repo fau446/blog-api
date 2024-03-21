@@ -11,7 +11,7 @@ exports.add_comment = [
     .escape(),
   body("name").trim().escape(),
 
-  async (req, res, next) => {
+  asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -20,42 +20,36 @@ exports.add_comment = [
       });
     }
 
-    try {
-      const post = await Post.findById(req.params.id).exec();
-      let name;
+    const post = await Post.findById(req.params.id).exec();
+    let name;
 
-      if (post === null) {
-        const err = new Error("Post not found");
-        err.status = 404;
-        return next(err);
-      }
-
-      if (req.body.name === "") {
-        name = "Anonymous";
-      } else {
-        name = req.body.name;
-      }
-
-      const commentDetails = {
-        post: req.params.id,
-        name,
-        message: req.body.message,
-      };
-
-      const newComment = new Comment(commentDetails);
-      await newComment.save();
-
-      // Update post's comment array with the new comment
-      await Post.findOneAndUpdate(
-        { _id: req.params.id },
-        { $push: { comments: newComment } }
-      );
-
-      res.status(200).json({ message: "Comment saved", newComment });
-    } catch (err) {
-      res.status(400).json({
-        err,
-      });
+    if (post === null) {
+      const err = new Error("Post not found");
+      err.status = 404;
+      return next(err);
     }
-  },
+
+    if (req.body.name === "") {
+      name = "Anonymous";
+    } else {
+      name = req.body.name;
+    }
+
+    const commentDetails = {
+      post: req.params.id,
+      name,
+      message: req.body.message,
+    };
+
+    const newComment = new Comment(commentDetails);
+    await newComment.save();
+
+    // Update post's comment array with the new comment
+    await Post.findOneAndUpdate(
+      { _id: req.params.id },
+      { $push: { comments: newComment } }
+    );
+
+    res.status(200).json({ message: "Comment saved", newComment });
+  }),
 ];
