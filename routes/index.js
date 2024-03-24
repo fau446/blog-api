@@ -7,11 +7,13 @@ const userController = require("../controllers/userController");
 
 router.get("/posts", postController.posts);
 
+router.get("/all-posts", postController.all_posts);
+
 router.get("/posts/:id", postController.post_detail);
 
 router.post("/posts/:id", commentController.add_comment);
 
-router.post("/create_user", userController.create_user);
+router.post("/create-user", userController.create_user);
 
 router.post("/login", userController.login);
 
