@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const { body, validationResult } = require("express-validator");
 
 const Post = require("../models/post");
+const Comment = require("../models/comment");
 
 const asyncHandler = require("express-async-handler");
 
@@ -89,6 +90,27 @@ exports.create_post = [
     res.status(200);
   }),
 ];
+
+exports.delete_post = asyncHandler(async (req, res, next) => {
+  verifyToken(req, res, () => {
+    jwt.verify(req.token, process.env.SECRET_KEY, (err, authData) => {
+      if (err) {
+        res.sendStatus(403);
+      }
+    });
+  });
+
+  const post = await Post.findById(req.params.id);
+
+  await Comment.deleteMany({ _id: { $in: post.comments } });
+
+  // Delete the post itself
+  await Post.deleteOne({ _id: req.params.id });
+
+  res.status(200).json({
+    message: "Post has been deleted!",
+  });
+});
 
 // Verify Token
 function verifyToken(req, res, next) {
