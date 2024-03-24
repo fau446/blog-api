@@ -1,8 +1,8 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
+const { body, validationResult } = require("express-validator");
 
 const Post = require("../models/post");
-const Comment = require("../models/comment");
 
 const asyncHandler = require("express-async-handler");
 
@@ -51,6 +51,44 @@ exports.all_posts = asyncHandler(async (req, res, next) => {
     posts,
   });
 });
+
+exports.create_post = [
+  // sanitize
+  body("title", "Title cannot be blank!").trim().isLength({ min: 1 }).escape(),
+  body("content", "Content cannot be blank!")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+
+  asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        errors: errors.array(),
+      });
+    }
+
+    verifyToken(req, res, () => {
+      jwt.verify(req.token, process.env.SECRET_KEY, (err, authData) => {
+        if (err) {
+          res.sendStatus(403);
+        }
+      });
+    });
+
+    const post = new Post({
+      title: req.body.title,
+      content: req.body.content,
+      comments: [],
+      published: req.body.published,
+    });
+
+    await post.save();
+
+    res.status(200);
+  }),
+];
 
 // Verify Token
 function verifyToken(req, res, next) {

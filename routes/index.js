@@ -11,6 +11,8 @@ router.get("/all-posts", postController.all_posts);
 
 router.get("/posts/:id", postController.post_detail);
 
+router.post("/create-post", postController.create_post);
+
 router.post("/posts/:id", commentController.add_comment);
 
 router.post("/create-user", userController.create_user);
