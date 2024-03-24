@@ -55,11 +55,16 @@ exports.login = [
     }
 
     // if login successful, generate jwt.
-    jwt.sign({}, process.env.SECRET_KEY, { expiresIn: "1h" }, (err, token) => {
-      res.status(200).json({
-        token,
-      });
-    });
+    jwt.sign(
+      { username: req.user.username },
+      process.env.SECRET_KEY,
+      { expiresIn: "1h" },
+      (err, token) => {
+        res.status(200).json({
+          token,
+        });
+      }
+    );
   }),
 ];
 
