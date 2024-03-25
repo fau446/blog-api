@@ -112,6 +112,44 @@ exports.delete_post = asyncHandler(async (req, res, next) => {
   });
 });
 
+exports.edit_post = [
+  body("title", "Title cannot be empty!").trim().isLength({ min: 1 }).escape(),
+  body("content", "Content cannot be empty!")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+
+  asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        errors: errors.array(),
+      });
+    } else {
+      verifyToken(req, res, async () => {
+        jwt.verify(req.token, process.env.SECRET_KEY, async (err, authData) => {
+          if (err) {
+            return res.sendStatus(403);
+          } else {
+            await Post.findByIdAndUpdate(req.params.id, {
+              $set: {
+                title: req.body.title,
+                content: req.body.content,
+                published: req.body.published,
+              },
+            });
+
+            res.status(200).json({
+              message: "Updated post!",
+            });
+          }
+        });
+      });
+    }
+  }),
+];
+
 // Verify Token
 function verifyToken(req, res, next) {
   // Get auth header value

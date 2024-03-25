@@ -15,6 +15,8 @@ router.post("/create-post", postController.create_post);
 
 router.delete("/posts/:id/delete", postController.delete_post);
 
+router.put("/posts/:id/edit", postController.edit_post);
+
 router.post("/posts/:id", commentController.add_comment);
 
 router.post("/create-user", userController.create_user);
