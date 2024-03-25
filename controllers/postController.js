@@ -92,23 +92,23 @@ exports.create_post = [
 ];
 
 exports.delete_post = asyncHandler(async (req, res, next) => {
-  verifyToken(req, res, () => {
-    jwt.verify(req.token, process.env.SECRET_KEY, (err, authData) => {
+  verifyToken(req, res, async () => {
+    jwt.verify(req.token, process.env.SECRET_KEY, async (err, authData) => {
       if (err) {
         res.sendStatus(403);
+      } else {
+        const post = await Post.findById(req.params.id);
+
+        await Comment.deleteMany({ _id: { $in: post.comments } });
+
+        // Delete the post itself
+        await Post.deleteOne({ _id: req.params.id });
+
+        res.status(200).json({
+          message: "Post has been deleted!",
+        });
       }
     });
-  });
-
-  const post = await Post.findById(req.params.id);
-
-  await Comment.deleteMany({ _id: { $in: post.comments } });
-
-  // Delete the post itself
-  await Post.deleteOne({ _id: req.params.id });
-
-  res.status(200).json({
-    message: "Post has been deleted!",
   });
 });
 
