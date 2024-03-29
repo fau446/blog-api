@@ -7,6 +7,7 @@ const session = require("express-session");
 const passport = require("passport");
 const bcrypt = require("bcryptjs");
 const LocalStrategy = require("passport-local").Strategy;
+const cors = require("cors");
 
 const mongoose = require("mongoose");
 mongoose.set("strictQuery", false);
@@ -30,6 +31,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(session({ secret: "cats", resave: false, saveUninitialized: true }));
 app.use(passport.session());
+app.use(cors());
 
 passport.use(
   new LocalStrategy(async (username, password, done) => {
