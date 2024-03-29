@@ -87,7 +87,9 @@ exports.create_post = [
 
     await post.save();
 
-    res.status(200);
+    res.status(200).json({
+      message: "Post successfully created!",
+    });
   }),
 ];
 
