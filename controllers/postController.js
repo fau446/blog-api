@@ -14,8 +14,12 @@ exports.posts = asyncHandler(async (req, res, next) => {
     .sort({ date_posted: 1 })
     .exec();
 
+  const postsWithVirtuals = posts.map((post) =>
+    post.toJSON({ virtuals: true })
+  );
+
   res.json({
-    posts,
+    posts: postsWithVirtuals,
   });
 });
 
@@ -28,8 +32,10 @@ exports.post_detail = asyncHandler(async (req, res, next) => {
     return next(err);
   }
 
+  const postsWithVirtuals = post.toJSON({ virtuals: true });
+
   res.json({
-    post,
+    post: postsWithVirtuals,
   });
 });
 
@@ -48,8 +54,12 @@ exports.all_posts = asyncHandler(async (req, res, next) => {
     .sort({ date_posted: 1 })
     .exec();
 
+  const postsWithVirtuals = posts.map((post) =>
+    post.toJSON({ virtuals: true })
+  );
+
   res.status(200).json({
-    posts,
+    posts: postsWithVirtuals,
   });
 });
 
